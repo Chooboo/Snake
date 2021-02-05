@@ -11,12 +11,22 @@ For instructions see https://github.com/BattlesnakeOfficial/starter-snake-python
 
 
 def avoid_walls(data):
+    direction = get_direction(data)
+
     if data.you_x in [0, data.height - 1]:
-        return random.choice(["up", "down"])
+      if direction == "up":
+        return "down"
+      else:
+        return "up"
+        
     elif data.you_y in [0, data.width - 1]:
-        return random.choice(["left", "right"])
+      if direction == "right":
+        return "left"
+      else:
+        return "right"
+        
     else:
-        return get_direction(data)
+        return direction
 
 
 def get_direction(data):
@@ -67,11 +77,9 @@ class Battlesnake(object):
         # This function is called on every turn of a game. It's how your snake decides where to move.
         # Valid moves are "up", "down", "left", or "right".
         data_raw = cherrypy.request.json
-
         data = Variables(data_raw)
 
-        possible_moves = ["up", "down", "left", "right"]
-        move = "left"
+        move = avoid_walls(data)
         print(data.you_x, data.you_y)
 
         print(f"MOVE: {move}")
