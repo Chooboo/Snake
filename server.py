@@ -16,7 +16,23 @@ def avoid_walls(data):
     elif data.you_y in [1, data.width - 1]:
         return random.choice(["left", "right"])
     else:
-        return None
+        return get_direction(data)
+
+
+def get_direction(data):
+    body_x = data.you_body[1]["x"]
+    body_y = data.you_body[1]["y"]
+    head_x = data.you_x
+    head_y = data.you_y
+
+    if body_x < head_x:
+        return "right"
+    elif body_x > head_x:
+        return "left"
+    elif body_y > head_y:
+        return "down"
+    else:
+        return "up"
 
 
 class Battlesnake(object):
