@@ -72,6 +72,8 @@ class Battlesnake(object):
 
         possible_moves = ["up", "down", "left", "right"]
         move = "left"
+        print(data.you_x)
+        print(data.you_y)
 
         print(f"MOVE: {move}")
         return {"move": move}
