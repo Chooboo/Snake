@@ -9,24 +9,18 @@ This is a simple Battlesnake server written in Python.
 For instructions see https://github.com/BattlesnakeOfficial/starter-snake-python/README.md
 """
 
+def get_board(data):
 
-def avoid_walls(data):
-    direction = get_direction(data)
+  board = []
+  for i in range(data.width):
+    board.append([])
+    for j in range(data.height):
+      board[i].append(0)
 
-    if data.you_x in [0, data.height - 1]:
-      if direction == "up":
-        return "down"
-      else:
-        return "up"
-        
-    elif data.you_y in [0, data.width - 1]:
-      if direction == "right":
-        return "left"
-      else:
-        return "right"
-        
-    else:
-        return direction
+  for bodypart in data.you_body:
+    board[bodypart["x"]][bodypart["y"]] = 1
+
+  return board
 
 
 def get_direction(data):
@@ -43,6 +37,30 @@ def get_direction(data):
         return "up"
     else:
         return "down"
+
+def get_valid_moves(data):
+
+  board = get_board(data)
+
+  valid_moves = []
+
+  if data.you_x != 0:
+    if board[data.you_x - 1][data.you_y] == 0:
+      valid_moves.append("left")
+
+  if data.you_x != data.width - 1:
+    if board[data.you_x + 1][data.you_y] == 0:
+      valid_moves.append("right")
+
+  if data.you_y != 0:
+    if board[data.you_x][data.you_y - 1] == 0:
+      valid_moves.append("down")
+
+  if data.you_y != data.height - 1:
+    if board[data.you_x][data.you_y + 1] == 0:
+      valid_moves.append("up")
+
+  return valid_moves
 
 
 class Battlesnake(object):
@@ -79,11 +97,11 @@ class Battlesnake(object):
         data_raw = cherrypy.request.json
         data = Variables(data_raw)
 
-        move = avoid_walls(data)
-        print(data.you_x, data.you_y)
+        move = random.choice(get_valid_moves(data))
 
         print(f"MOVE: {move}")
-        return {"move": move}
+        return {"move": move,
+                "taunt": "hello"}
 
     @cherrypy.expose
     @cherrypy.tools.json_in()
