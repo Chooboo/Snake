@@ -11,9 +11,9 @@ For instructions see https://github.com/BattlesnakeOfficial/starter-snake-python
 
 
 def avoid_walls(data):
-    if data.you_x in [1, data.height - 1]:
+    if data.you_x in [0, data.height - 1]:
         return random.choice(["up", "down"])
-    elif data.you_y in [1, data.width - 1]:
+    elif data.you_y in [0, data.width - 1]:
         return random.choice(["left", "right"])
     else:
         return get_direction(data)
@@ -27,12 +27,12 @@ def get_direction(data):
 
     if body_x < head_x:
         return "right"
-    elif body_x > head_x:
+    elif head_x < body_x:
         return "left"
-    elif body_y > head_y:
-        return "down"
-    else:
+    elif body_y < head_y:
         return "up"
+    else:
+        return "down"
 
 
 class Battlesnake(object):
@@ -72,8 +72,7 @@ class Battlesnake(object):
 
         possible_moves = ["up", "down", "left", "right"]
         move = "left"
-        print(data.you_x)
-        print(data.you_y)
+        print(data.you_x, data.you_y)
 
         print(f"MOVE: {move}")
         return {"move": move}
