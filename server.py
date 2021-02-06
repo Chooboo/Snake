@@ -12,10 +12,15 @@ For instructions see https://github.com/BattlesnakeOfficial/starter-snake-python
 
 def get_board(data):
     board = []
-    for i in range(data.width):
+    for i in range(data.width + 2):
         board.append([])
-        for j in range(data.height):
-            board[i].append(0)
+        for j in range(data.height + 2):
+            if i == 0 or i == data.width+1:
+                board[i].append('W')
+            elif j == 0 or j == data.height+1:
+                board[i].append('W')
+            else:
+                board[i].append(0)
 
     for snake in data.snakes:
         for bodypart in snake["body"][:-1]:
