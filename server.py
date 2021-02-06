@@ -9,19 +9,56 @@ This is a simple Battlesnake server written in Python.
 For instructions see https://github.com/BattlesnakeOfficial/starter-snake-python/README.md
 """
 
+
 def get_board(data):
+    board = []
+    for i in range(data.width):
+        board.append([])
+        for j in range(data.height):
+            board[i].append(0)
 
-  board = []
-  for i in range(data.width):
-    board.append([])
-    for j in range(data.height):
-      board[i].append(0)
+    for snake in data.snakes:
+        for bodypart in snake["body"][:-1]:
+            board[bodypart["x"]][bodypart["y"]] = 'S'
 
-  for snake in data.snakes:
-    for bodypart in snake["body"][:-1]:
-      board[bodypart["x"]][bodypart["y"]] = 'S'
+    return board
 
-  return board
+
+def get_closest_food(data):
+    best_food = {}
+    smallest_dist = 1000
+    for food in data.food:
+        dist = abs(food["x"] - data.you_x) + abs(food["y"] - data.you_y)
+        if dist < smallest_dist:
+            best_food = food
+            dist = smallest_dist
+
+    return best_food
+
+
+def seek_food(data):
+    food = get_closest_food(data)
+    moves = get_valid_moves(data)
+
+    dx = food["x"] - data.you_x
+    dy = food["y"] - data.you_y
+
+    food_moves = []
+    if dx > 0:
+        food_moves.append("right")
+    elif dx < 0:
+        food_moves.append("left")
+
+    if dy > 0:
+        food_moves.append("up")
+    elif dy < 0:
+        food_moves.append("down")
+
+    for move in food_moves:
+        if move in moves:
+            return move
+
+    return random.choice(moves)
 
 
 def get_direction(data):
@@ -41,31 +78,29 @@ def get_direction(data):
 
 
 def get_valid_moves(data):
+    board = get_board(data)
+    valid_moves = []
 
-  board = get_board(data)
+    if data.you_x != 0:
+        if board[data.you_x - 1][data.you_y] == 0:
+            valid_moves.append("left")
 
-  valid_moves = []
+    if data.you_x != data.width - 1:
+        if board[data.you_x + 1][data.you_y] == 0:
+            valid_moves.append("right")
 
-  if data.you_x != 0:
-    if board[data.you_x - 1][data.you_y] == 0:
-      valid_moves.append("left")
+    if data.you_y != 0:
+        if board[data.you_x][data.you_y - 1] == 0:
+            valid_moves.append("down")
 
-  if data.you_x != data.width - 1:
-    if board[data.you_x + 1][data.you_y] == 0:
-      valid_moves.append("right")
+    if data.you_y != data.height - 1:
+        if board[data.you_x][data.you_y + 1] == 0:
+            valid_moves.append("up")
 
-  if data.you_y != 0:
-    if board[data.you_x][data.you_y - 1] == 0:
-      valid_moves.append("down")
-
-  if data.you_y != data.height - 1:
-    if board[data.you_x][data.you_y + 1] == 0:
-      valid_moves.append("up")
-  
-  if len(valid_moves) == 0:
-    return ["up"]
-  else:
-    return valid_moves
+    if len(valid_moves) == 0:
+        return ["up"]
+    else:
+        return valid_moves
 
 
 class Battlesnake(object):
@@ -104,13 +139,16 @@ class Battlesnake(object):
 
         valid_moves = get_valid_moves(data)
         direction = get_direction(data)
+        '''
         if direction in valid_moves:
-          if random.random() < 0.7:
-            move = direction
-          else:
-            move = random.choice(valid_moves)            
+            if random.random() < 0.75:
+                move = direction
+            else:
+                move = random.choice(valid_moves)
         else:
-          move = random.choice(valid_moves)
+            move = random.choice(valid_moves)
+        '''
+        move = seek_food(data)
 
         print(f"MOVE: {move}")
         return {"move": move,
