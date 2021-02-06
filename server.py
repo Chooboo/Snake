@@ -61,8 +61,11 @@ def get_valid_moves(data):
   if data.you_y != data.height - 1:
     if board[data.you_x][data.you_y + 1] == 0:
       valid_moves.append("up")
-
-  return valid_moves
+  
+  if len(valid_moves) == 0:
+    return ["up"]
+  else:
+    return valid_moves
 
 
 class Battlesnake(object):
