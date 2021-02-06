@@ -61,6 +61,21 @@ def seek_food(data):
     return random.choice(moves)
 
 
+def move_randomly(data):
+    valid_moves = get_valid_moves(data)
+    direction = get_direction(data)
+
+    if direction in valid_moves:
+        if random.random() < 0.75:
+            move = direction
+        else:
+            move = random.choice(valid_moves)
+    else:
+        move = random.choice(valid_moves)
+
+    return move
+
+
 def get_direction(data):
     body_x = data.you_body[1]["x"]
     body_y = data.you_body[1]["y"]
@@ -137,18 +152,10 @@ class Battlesnake(object):
         data_raw = cherrypy.request.json
         data = Variables(data_raw)
 
-        valid_moves = get_valid_moves(data)
-        direction = get_direction(data)
-        '''
-        if direction in valid_moves:
-            if random.random() < 0.75:
-                move = direction
-            else:
-                move = random.choice(valid_moves)
+        if data.you_health < 55:
+            move = seek_food(data)
         else:
-            move = random.choice(valid_moves)
-        '''
-        move = seek_food(data)
+            move = move_randomly(data)
 
         print(f"MOVE: {move}")
         return {"move": move,
