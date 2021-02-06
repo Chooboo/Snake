@@ -17,8 +17,9 @@ def get_board(data):
     for j in range(data.height):
       board[i].append(0)
 
-  for bodypart in data.you_body:
-    board[bodypart["x"]][bodypart["y"]] = 1
+  for snake in data.snakes:
+    for bodypart in snake["body"][:-1]:
+      board[bodypart["x"]][bodypart["y"]] = 'S'
 
   return board
 
@@ -37,6 +38,7 @@ def get_direction(data):
         return "up"
     else:
         return "down"
+
 
 def get_valid_moves(data):
 
@@ -73,7 +75,7 @@ class Battlesnake(object):
         return {
             "apiversion": "1",
             "author": "",  # TODO: Your Battlesnake Username
-            "color": "#888888",  # TODO: Personalize
+            "color": "#666666",  # TODO: Personalize
             "head": "default",  # TODO: Personalize
             "tail": "default",  # TODO: Personalize
         }
@@ -97,7 +99,15 @@ class Battlesnake(object):
         data_raw = cherrypy.request.json
         data = Variables(data_raw)
 
-        move = random.choice(get_valid_moves(data))
+        valid_moves = get_valid_moves(data)
+        direction = get_direction(data)
+        if direction in valid_moves:
+          if random.random() < 0.7:
+            move = direction
+          else:
+            move = random.choice(valid_moves)            
+        else:
+          move = random.choice(valid_moves)
 
         print(f"MOVE: {move}")
         return {"move": move,
